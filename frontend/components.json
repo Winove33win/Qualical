@@ -1,0 +1,11 @@
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "aliases": {
+    "components": "@/components",
+    "utils": "@/lib/utils"
+  },
+  "tailwind": {
+    "config": "tailwind.config.ts",
+    "css": "src/styles/index.css"
+  }
+}

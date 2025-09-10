@@ -1,0 +1,16 @@
+# Node
+node_modules/
+npm-debug.log
+# lock files
+# we commit package-lock.json for reproducible builds
+# yarn and pnpm lock files can be ignored
+yarn.lock
+pnpm-lock.yaml
+dist/
+build/
+*.log
+.env
+.env.*
+!.env.example
+.DS_Store
+upload/
