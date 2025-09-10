@@ -1,0 +1,61 @@
+name: Deploy to Plesk
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Build frontend
+      - name: Install frontend deps
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: ./frontend
+        env:
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
+        run: npm run build
+
+      # Preparar pacote para upload
+      - name: Prepare upload folder
+        run: |
+          mkdir -p upload/httpdocs/backend/public
+          # copiar backend (exceto node_modules, .env, logs)
+          rsync -av --exclude=node_modules --exclude=.env --exclude=logs --exclude=.DS_Store httpdocs/backend/ upload/httpdocs/backend/
+          # copiar build do frontend para public
+          rsync -av frontend/dist/ upload/httpdocs/backend/public/
+
+      # Deploy via FTP
+      - name: FTP Deploy
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USER }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          port: ${{ secrets.FTP_PORT }}
+          protocol: ftp
+          local-dir: upload/
+          server-dir: ${{ secrets.REMOTE_BASE }}/
+          log-level: verbose
+          timeout: 600000
+          exclude: |
+            **/.git*
+            **/.DS_Store
+            **/node_modules/**
+
+      # Opcional: criar/atualizar um arquivo para sinalizar restart (optional)
+      - name: Touch restart flag (optional)
+        run: |
+          echo "$(date)" > upload/httpdocs/backend/REDEPLOY.txt
