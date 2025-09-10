@@ -14,6 +14,8 @@ npm run dev
 cd frontend
 npm ci
 npm run dev
+# Build para produção
+npm run build  # gera arquivos estáticos em ../httpdocs/backend/public
 ```
 
 Acesse http://localhost:3333/api/health para checar a API e banco de dados.
