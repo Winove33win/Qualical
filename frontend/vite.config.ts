@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import path from 'path'
 
 // Durante o dev, proxy para backend local:
 export default defineConfig({
@@ -14,6 +15,8 @@ export default defineConfig({
     }
   },
   build: {
-    outDir: 'dist'
+    // Produz build no backend para ser servido pelo Express
+    outDir: path.resolve(__dirname, '../httpdocs/backend/public'),
+    emptyOutDir: true
   }
 })
